@@ -110,7 +110,7 @@
             <img src="/Logo.png" alt="Sachal Consulting Services">
         </div>
 
-        <h2><i class="fas fa-shield-alt" style="color:var(--accent);margin-right:7px;"></i>Certificate Verification</h2>
+        <h2><i class="fas fa-shield-alt" style="color:var(--accent);margin-right:7px;"></i>Certificate Verification Test</h2>
         <p class="sub">Enter a Certificate ID to verify its authenticity.</p>
 
 
