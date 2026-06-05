@@ -7,6 +7,7 @@ use App\Http\Controllers\VerificationController;
 // Public verification
 Route::get('/verification', [VerificationController::class, 'index']);
 Route::post('/verification', [VerificationController::class, 'verify'])->name('verification.check');
+Route::get('/verification/{certificate_id}/pdf', [VerificationController::class, 'downloadPdf'])->name('verification.pdf');
 
 // Admin auth
 Route::get('/admin', [AdminController::class, 'loginPage']);
@@ -20,6 +21,10 @@ Route::post('/admin/certificates', [AdminController::class, 'store'])->name('cer
 Route::get('/admin/certificates/{id}/edit', [AdminController::class, 'editPage']);
 Route::put('/admin/certificates/{id}', [AdminController::class, 'update'])->name('certificates.update');
 Route::delete('/admin/certificates/{id}', [AdminController::class, 'delete'])->name('certificates.delete');
+
+// Change password (both roles)
+Route::get('/admin/change-password', [AdminController::class, 'changePasswordPage']);
+Route::post('/admin/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
 
 // Redirect root to verification
 Route::get('/', function () {
