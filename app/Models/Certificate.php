@@ -12,7 +12,9 @@ class Certificate extends Model
     protected $fillable = [
         'candidate_name',
         'training_name',
-        'completion_date',
+        'start_date',
+        'end_date',
+        'course_type',
         'status',
         'certificate_id',
     ];

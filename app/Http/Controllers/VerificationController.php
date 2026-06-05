@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
@@ -25,5 +26,21 @@ class VerificationController extends Controller
         }
 
         return view('verification-result', ['certificate' => $certificate, 'notFound' => false]);
+    }
+
+    public function downloadPdf(string $certificate_id)
+    {
+        $certificate = Certificate::where('certificate_id', $certificate_id)
+            ->where('status', 'Valid')
+            ->first();
+
+        if (!$certificate) {
+            abort(404, 'Certificate not found.');
+        }
+
+        $pdf = Pdf::loadView('certificate-pdf', compact('certificate'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('certificate-' . $certificate->certificate_id . '.pdf');
     }
 }

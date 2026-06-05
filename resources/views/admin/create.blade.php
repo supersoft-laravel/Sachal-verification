@@ -4,8 +4,6 @@
 
 @section('content')
 
-
-
 <nav class="admin-navbar">
     <div class="brand">
         <img src="/Logo.png" alt="Sachal Consulting Services">
@@ -15,6 +13,9 @@
         <a href="/admin/dashboard" class="nav-link-item">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
+        <a href="/admin/change-password" class="nav-link-item">
+            <i class="fas fa-key"></i> Change Password
+        </a>
         <a href="/admin/logout" class="btn-logout">
             <i class="fas fa-sign-out-alt"></i> Logout
         </a>
@@ -23,13 +24,11 @@
 
 <main>
 <div class="main-content">
-    <div class="card-box" style="max-width:640px;margin:0 auto;">
+    <div class="card-box" style="max-width:680px;margin:0 auto;">
         <div class="card-box-header">
             <h5><i class="fas fa-plus-circle" style="color:var(--accent);margin-right:7px;"></i>New Certificate</h5>
         </div>
         <div class="card-box-body">
-
-
 
             {{-- Auto-ID notice --}}
             <div style="background:var(--primary-light);border:1px solid #c5d5f0;border-radius:9px;padding:0.85rem 1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;font-size:0.86rem;color:var(--primary);">
@@ -55,10 +54,28 @@
                         value="{{ old('training_name') }}" placeholder="e.g. Fire Safety Training" required>
                 </div>
 
+                {{-- Start Date / End Date --}}
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.1rem;">
+                    <div>
+                        <label class="f-label">Start Date</label>
+                        <input type="date" name="start_date" class="f-control"
+                            value="{{ old('start_date') }}">
+                    </div>
+                    <div>
+                        <label class="f-label">End Date</label>
+                        <input type="date" name="end_date" class="f-control"
+                            value="{{ old('end_date') }}">
+                    </div>
+                </div>
+
+                {{-- Course Type --}}
                 <div style="margin-bottom:1.1rem;">
-                    <label class="f-label">Completion Date <span style="color:var(--danger-text);">*</span></label>
-                    <input type="date" name="completion_date" class="f-control"
-                        value="{{ old('completion_date') }}" required>
+                    <label class="f-label">Course Type</label>
+                    <select name="course_type" class="f-control">
+                        <option value="">-- Select --</option>
+                        <option value="Physical" {{ old('course_type') === 'Physical' ? 'selected' : '' }}>Physical</option>
+                        <option value="Online"   {{ old('course_type') === 'Online'   ? 'selected' : '' }}>Online</option>
+                    </select>
                 </div>
 
                 <div style="margin-bottom:1.6rem;">
@@ -96,4 +113,3 @@
     });
 </script>
 @endsection
-

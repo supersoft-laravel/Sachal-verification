@@ -20,11 +20,10 @@
         border: 1px solid var(--border);
         box-shadow: 0 4px 30px rgba(26,92,184,0.1);
         width: 100%;
-        max-width: 520px;
+        max-width: 560px;
         overflow: hidden;
     }
 
-    /* --- LOGO AREA --- */
     .result-logo {
         text-align: center;
         padding: 1.8rem 2rem 1.2rem;
@@ -37,7 +36,6 @@
         object-fit: contain;
     }
 
-    /* --- STATUS BANNER (thin strip, not full header) --- */
     .status-strip {
         display: flex;
         align-items: center;
@@ -59,7 +57,6 @@
         border-bottom: 1px solid #f5c6c6;
     }
 
-    /* --- DETAIL ROWS --- */
     .detail-body {
         padding: 0.4rem 1.6rem 1.2rem;
     }
@@ -91,10 +88,18 @@
         text-align: right;
     }
 
-    /* --- ACTIONS --- */
+    .detail-val.course-title {
+        font-size: 1.08rem;
+        font-weight: 800;
+    }
+
     .result-actions {
         padding: 1rem 1.6rem 1.6rem;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
     }
 
     .btn-back {
@@ -112,12 +117,42 @@
         transition: all 0.2s;
     }
 
-    .btn-back:hover {
-        background: var(--primary);
-        color: white;
+    .btn-back:hover { background: var(--primary); color: white; }
+
+    .btn-pdf {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+        border: 1px solid #f5c6c6;
+        border-radius: 8px;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s;
     }
 
-    /* --- NOT FOUND --- */
+    .btn-pdf:hover { background: var(--danger-text); color: white; }
+
+    .btn-print {
+        background: var(--accent-light);
+        color: var(--accent);
+        border: 1px solid #ffd9b8;
+        border-radius: 8px;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s;
+    }
+
+    .btn-print:hover { background: var(--accent); color: white; }
+
     .not-found-body {
         padding: 2rem 1.6rem;
         text-align: center;
@@ -142,13 +177,31 @@
         max-width: 320px;
         margin: 0 auto;
     }
+
+    /* ── PRINT STYLES: hide everything except the result card ── */
+    @media print {
+        body * { visibility: hidden; }
+        .result-card, .result-card * { visibility: visible; }
+        .result-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+        }
+        .result-actions { display: none !important; }
+        .site-footer { display: none !important; }
+    }
 </style>
 @endsection
 
 @section('content')
 <main>
 <div class="result-wrap">
-    <div class="result-card">
+    <div class="result-card" id="printArea">
 
         {{-- LOGO --}}
         <div class="result-logo">
@@ -177,18 +230,54 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-key">Training / Course</span>
-                    <span class="detail-val">{{ $certificate->training_name }}</span>
+                    <span class="detail-val course-title">{{ $certificate->training_name }}</span>
                 </div>
+                @if($certificate->course_type)
                 <div class="detail-row">
-                    <span class="detail-key">Completion Date</span>
-                    <span class="detail-val">{{ \Carbon\Carbon::parse($certificate->completion_date)->format('d M Y') }}</span>
+                    <span class="detail-key">Course Type</span>
+                    <span class="detail-val">
+                        <span style="display:inline-flex;align-items:center;gap:5px;">
+                            @if($certificate->course_type === 'Physical')
+                                <i class="fas fa-building" style="color:var(--primary);font-size:0.82rem;"></i>
+                            @else
+                                <i class="fas fa-wifi" style="color:var(--accent);font-size:0.82rem;"></i>
+                            @endif
+                            {{ $certificate->course_type }}
+                        </span>
+                    </span>
                 </div>
+                @endif
+                @if($certificate->start_date)
+                <div class="detail-row">
+                    <span class="detail-key">Start Date</span>
+                    <span class="detail-val">{{ \Carbon\Carbon::parse($certificate->start_date)->format('d M Y') }}</span>
+                </div>
+                @endif
+                @if($certificate->end_date)
+                <div class="detail-row">
+                    <span class="detail-key">End Date</span>
+                    <span class="detail-val">{{ \Carbon\Carbon::parse($certificate->end_date)->format('d M Y') }}</span>
+                </div>
+                @endif
                 <div class="detail-row">
                     <span class="detail-key">Status</span>
                     <span class="detail-val">
                         <span class="badge-valid"><i class="fas fa-check"></i> Valid</span>
                     </span>
                 </div>
+            </div>
+
+            {{-- ACTIONS --}}
+            <div class="result-actions">
+                <a href="/verification" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Verify Another
+                </a>
+                <a href="/verification/{{ $certificate->certificate_id }}/pdf" class="btn-pdf">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <button onclick="window.print()" class="btn-print">
+                    <i class="fas fa-print"></i> Print
+                </button>
             </div>
 
         @else
@@ -203,14 +292,13 @@
                 <h4>Invalid Certificate ID</h4>
                 <p>The certificate ID you entered does not exist or has been marked as invalid. Please double-check and try again.</p>
             </div>
+            <div class="result-actions">
+                <a href="/verification" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Verify Another Certificate
+                </a>
+            </div>
 
         @endif
-
-        <div class="result-actions">
-            <a href="/verification" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Verify Another Certificate
-            </a>
-        </div>
 
     </div>
 </div>
