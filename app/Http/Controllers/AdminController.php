@@ -76,7 +76,7 @@ class AdminController extends Controller
             });
         }
 
-        $certificates = $query->paginate(25)->withQueryString();
+        $certificates = $query->paginate(10)->withQueryString();
 
         $totalCount   = Certificate::count();
         $validCount   = Certificate::where('status', 'Valid')->count();
@@ -179,13 +179,37 @@ class AdminController extends Controller
     }
 
     // ────────────────────────────────
-    //  CHANGE PASSWORD
+    //  PROFILE SETTINGS
     // ────────────────────────────────
 
-    public function changePasswordPage()
+    public function profilePage()
     {
         $this->checkAuth();
-        return view('admin.change-password');
+        $user = User::where('email', session('admin_email'))->firstOrFail();
+        return view('admin.profile-settings', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $this->checkAuth();
+
+        $user = User::where('email', session('admin_email'))->firstOrFail();
+
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        $user->name  = $request->name;
+        $user->email = $request->email;
+        $user->save();
+
+        session([
+            'admin_name'  => $request->name,
+            'admin_email' => $request->email,
+        ]);
+
+        return back()->with('profile_success', 'Profile updated successfully!');
     }
 
     public function changePassword(Request $request)
@@ -200,13 +224,13 @@ class AdminController extends Controller
         $user = User::where('email', session('admin_email'))->firstOrFail();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'Current password is incorrect.');
+            return back()->with('password_error', 'Current password is incorrect.');
         }
 
         $user->password = Hash::make($request->new_password);
         $user->save();
 
-        return back()->with('success', 'Password changed successfully!');
+        return back()->with('password_success', 'Password updated successfully!');
     }
 
     // ────────────────────────────────
