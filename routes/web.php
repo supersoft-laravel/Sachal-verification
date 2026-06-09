@@ -22,9 +22,13 @@ Route::get('/admin/certificates/{id}/edit', [AdminController::class, 'editPage']
 Route::put('/admin/certificates/{id}', [AdminController::class, 'update'])->name('certificates.update');
 Route::delete('/admin/certificates/{id}', [AdminController::class, 'delete'])->name('certificates.delete');
 
-// Change password (both roles)
-Route::get('/admin/change-password', [AdminController::class, 'changePasswordPage']);
-Route::post('/admin/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
+// Profile settings (both roles)
+Route::get('/admin/profile', [AdminController::class, 'profilePage'])->name('admin.profile');
+Route::post('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+Route::post('/admin/profile/password', [AdminController::class, 'changePassword'])->name('admin.profile.password');
+
+// Backward-compat redirect for old change-password URL
+Route::get('/admin/change-password', fn () => redirect('/admin/profile'));
 
 // Redirect root to verification
 Route::get('/', function () {

@@ -47,8 +47,8 @@
         .admin-navbar {
             background: var(--white);
             border-bottom: 1px solid var(--border);
-            padding: 0 1.8rem;
-            height: 64px;
+            padding: 0.75rem 1.8rem;
+            min-height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -116,8 +116,8 @@
 
         /* ── CONTENT WRAPPER ── */
         .main-content {
-            padding: 1.8rem 2rem;
-            max-width: 1280px;
+            padding: 1.8rem 2.5rem;
+            max-width: 1600px;
             margin: 0 auto;
             width: 100%;
         }
@@ -426,23 +426,37 @@
         @media (max-width: 768px) {
             .admin-navbar {
                 padding: 0.6rem 1rem;
-                height: auto;
-                min-height: 56px;
+                min-height: auto;
                 flex-wrap: wrap;
-                gap: 0.5rem;
+                gap: 0.4rem;
+                row-gap: 0.5rem;
             }
+            .admin-navbar .brand { flex-shrink: 0; }
             .admin-navbar .brand img { height: 32px; }
-            .admin-navbar .nav-actions { gap: 0.6rem; }
-            .admin-navbar .nav-link-item { font-size: 0.82rem; }
+            .admin-navbar .brand-text { display: none; }
+            .admin-navbar .nav-actions {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+            .admin-navbar .nav-link-item { font-size: 0.81rem; }
             .btn-logout { font-size: 0.8rem; padding: 0.32rem 0.75rem; }
             .main-content { padding: 1rem; }
-            .brand-text { display: none; }
+        }
+
+        /* On small phones hide the "Verification Page" text, keep icon only */
+        @media (max-width: 480px) {
+            .admin-navbar {
+                padding: 0.55rem 0.85rem;
+                gap: 0.35rem;
+                row-gap: 0.45rem;
+            }
+            .admin-navbar .brand img { height: 30px; }
+            .nav-link-text { display: none; }
+            .admin-navbar .nav-actions { gap: 0.4rem; }
         }
 
         @media (max-width: 375px) {
-            .admin-navbar {
-                padding: 0.55rem 0.85rem;
-            }
+            .admin-navbar { padding: 0.5rem 0.75rem; }
             .admin-navbar .brand img { height: 28px; }
             #toast-container {
                 top: 0.7rem;
@@ -521,6 +535,70 @@
             from { opacity: 1; transform: translateX(0); }
             to   { opacity: 0; transform: translateX(30px); }
         }
+
+        /* ── PROFILE AVATAR (navbar) ── */
+        .nav-profile {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            padding: 0.28rem 0.75rem 0.28rem 0.28rem;
+            border-radius: 30px;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .nav-profile:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-profile .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .nav-profile .nav-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-profile .nav-role {
+            font-size: 0.68rem;
+            font-weight: 700;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.08rem 0.4rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-profile:hover .nav-role {
+            background: white;
+        }
+
+        @media (max-width: 640px) {
+            .nav-profile .nav-name,
+            .nav-profile .nav-role { display: none; }
+        }
     </style>
     @yield('extra-css')
 </head>
@@ -568,6 +646,15 @@
             @endif
             @if (session('error'))
                 showToast(@json(session('error')), 'err');
+            @endif
+            @if (session('profile_success'))
+                showToast(@json(session('profile_success')), 'ok');
+            @endif
+            @if (session('password_success'))
+                showToast(@json(session('password_success')), 'ok');
+            @endif
+            @if (session('password_error'))
+                showToast(@json(session('password_error')), 'err');
             @endif
         });
     </script>
