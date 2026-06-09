@@ -7,14 +7,18 @@
 <nav class="admin-navbar">
     <div class="brand">
         <img src="/Logo.png" alt="Sachal Consulting Services">
-        <span class="brand-text">Admin Panel</span>
+        <span class="brand-text">
+            {{ session('admin_role') === 'coordinator' ? 'Coordinator Panel' : 'Admin Panel' }}
+        </span>
     </div>
     <div class="nav-actions">
         <a href="/admin/dashboard" class="nav-link-item">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
-        <a href="/admin/change-password" class="nav-link-item">
-            <i class="fas fa-key"></i> Change Password
+        <a href="/admin/profile" class="nav-profile" title="Profile Settings">
+            <span class="avatar">{{ strtoupper(substr(session('admin_name', 'U'), 0, 1)) }}</span>
+            <span class="nav-name">{{ session('admin_name') }}</span>
+            <span class="nav-role">{{ session('admin_role') }}</span>
         </a>
         <a href="/admin/logout" class="btn-logout">
             <i class="fas fa-sign-out-alt"></i> Logout
