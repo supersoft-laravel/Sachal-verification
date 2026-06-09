@@ -129,10 +129,65 @@
     }
 
     /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+        /* stat cards already stack via auto-fit, just tighten gap */
+        .stat-card { padding: 1rem; }
+        .stat-value { font-size: 1.4rem; }
+    }
+
     @media (max-width: 640px) {
-        .search-input { width: 150px; }
-        .search-input:focus { width: 160px; }
-        .card-box-header { flex-direction: column; align-items: flex-start !important; }
+        /* card header: title on top, controls below */
+        .card-box-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.7rem !important;
+        }
+
+        /* search + button row: full width, wrap */
+        .toolbar-row {
+            width: 100%;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.5rem !important;
+            margin-left: 0 !important;
+        }
+
+        .toolbar-search-form {
+            width: 100%;
+            flex-direction: row !important;
+        }
+
+        .search-input {
+            width: 100% !important;
+            flex: 1;
+        }
+
+        .search-input:focus { width: 100% !important; }
+
+        .btn-new-cert {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* table: smaller text + tighter cells */
+        .tbl-compact thead th { font-size: 0.67rem; padding: 0.5rem 0.45rem; }
+        .tbl-compact tbody td { font-size: 0.77rem; padding: 0.45rem 0.45rem; }
+
+        /* action icons still usable */
+        .btn-icon-edit,
+        .btn-icon-del { width: 28px; height: 28px; font-size: 0.72rem; }
+
+        /* pagination wraps */
+        .pg-footer {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.6rem !important;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .tbl-compact thead th { font-size: 0.62rem; padding: 0.45rem 0.35rem; }
+        .tbl-compact tbody td { font-size: 0.72rem; padding: 0.4rem 0.35rem; }
     }
 </style>
 @endsection
@@ -142,21 +197,19 @@
 <nav class="admin-navbar">
     <div class="brand">
         <img src="/Logo.png" alt="Sachal Consulting Services">
-        <span class="brand-text">Admin Panel</span>
+        <span class="brand-text">
+            {{ session('admin_role') === 'coordinator' ? 'Coordinator Panel' : 'Admin Panel' }}
+        </span>
     </div>
     <div class="nav-actions">
-        <span style="font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:5px;">
-            <i class="fas fa-user-circle"></i>
-            {{ session('admin_name') }}
-            <span style="background:var(--primary-light);color:var(--primary);font-size:0.72rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:20px;text-transform:uppercase;">
-                {{ session('admin_role') }}
-            </span>
-        </span>
-        <a href="/verification" target="_blank" class="nav-link-item">
-            <i class="fas fa-external-link-alt"></i> Verification Page
+        <a href="/admin/profile" class="nav-profile" title="Profile Settings">
+            <span class="avatar">{{ strtoupper(substr(session('admin_name', 'U'), 0, 1)) }}</span>
+            <span class="nav-name">{{ session('admin_name') }}</span>
+            <span class="nav-role">{{ session('admin_role') }}</span>
         </a>
-        <a href="/admin/change-password" class="nav-link-item">
-            <i class="fas fa-key"></i> Change Password
+        <a href="/verification" target="_blank" class="nav-link-item">
+            <i class="fas fa-external-link-alt"></i>
+            <span class="nav-link-text"> Verification Page</span>
         </a>
         <a href="/admin/logout" class="btn-logout">
             <i class="fas fa-sign-out-alt"></i> Logout
@@ -200,9 +253,9 @@
             </h5>
 
             {{-- Search + New Certificate (search on left, button on right) --}}
-            <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-left:auto;">
-                <form method="GET" action="/admin/dashboard" style="display:flex;align-items:center;gap:0.4rem;">
-                    <div style="position:relative;">
+            <div class="toolbar-row" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-left:auto;">
+                <form method="GET" action="/admin/dashboard" class="toolbar-search-form" style="display:flex;align-items:center;gap:0.4rem;">
+                    <div style="position:relative;flex:1;">
                         <i class="fas fa-search" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.78rem;pointer-events:none;"></i>
                         <input
                             type="text"
@@ -212,18 +265,18 @@
                             class="search-input"
                         >
                     </div>
-                    <button type="submit" class="btn-primary-c" style="padding:0.42rem 0.85rem;" title="Search">
+                    <button type="submit" class="btn-primary-c" style="padding:0.42rem 0.85rem;flex-shrink:0;" title="Search">
                         <i class="fas fa-search"></i>
                     </button>
                     @if(request('search'))
                         <a href="/admin/dashboard" class="btn-primary-c" title="Clear search"
-                            style="padding:0.42rem 0.85rem;background:var(--bg);color:var(--muted);border:1px solid var(--border);">
+                            style="padding:0.42rem 0.85rem;background:var(--bg);color:var(--muted);border:1px solid var(--border);flex-shrink:0;">
                             <i class="fas fa-times"></i>
                         </a>
                     @endif
                 </form>
 
-                <a href="/admin/certificates/create" class="btn-accent">
+                <a href="/admin/certificates/create" class="btn-accent btn-new-cert">
                     <i class="fas fa-plus"></i> New Certificate
                 </a>
             </div>
@@ -241,14 +294,14 @@
                 @endif
             </div>
         @else
-            <div class="table-responsive" style="overflow-x:auto;">
+            <div class="table-responsive" style="overflow-x:auto;padding:0 1.2rem 0.5rem;">
                 <table class="table tbl-compact mb-0" style="min-width:860px;">
                     <thead>
                         <tr>
                             <th style="width:38px;">#</th>
                             <th>Certificate ID</th>
                             <th>Candidate Name</th>
-                            <th>Course</th>
+                            <th style="text-align:center;">Course</th>
                             <th>Type</th>
                             <th>Start</th>
                             <th>End</th>
@@ -278,7 +331,7 @@
                             <td style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;">
                                 {{ $cert->candidate_name }}
                             </td>
-                            <td style="color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;">
+                            <td style="color:var(--muted);text-align:center;">
                                 {{ $cert->training_name }}
                             </td>
                             <td>
@@ -333,7 +386,7 @@
 
             {{-- PAGINATION --}}
             @if($certificates->hasPages())
-                <div style="padding:0.9rem 1.2rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                <div class="pg-footer" style="padding:0.9rem 1.2rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
                     <span style="font-size:0.8rem;color:var(--muted);">
                         Showing {{ $certificates->firstItem() }}–{{ $certificates->lastItem() }} of {{ $certificates->total() }} records
                     </span>
