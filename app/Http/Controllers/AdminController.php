@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Certificate;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -112,15 +113,22 @@ class AdminController extends Controller
 
         $certificate_id = $this->generateCertificateId();
 
-        Certificate::create([
-            'candidate_name'  => $request->candidate_name,
-            'training_name'   => $request->training_name,
-            'status'          => $request->status,
-            'certificate_id'  => $certificate_id,
-            'start_date'      => $request->start_date ?: null,
-            'end_date'        => $request->end_date ?: null,
-            'course_type'     => $request->course_type ?: null,
-        ]);
+        try {
+            Certificate::create([
+                'candidate_name'  => $request->candidate_name,
+                'training_name'   => $request->training_name,
+                'status'          => $request->status,
+                'certificate_id'  => $certificate_id,
+                'start_date'      => $request->start_date ?: null,
+                'end_date'        => $request->end_date ?: null,
+                'course_type'     => $request->course_type ?: null,
+            ]);
+        } catch (QueryException $e) {
+            if ($e->errorInfo[1] === 1062) {
+                return back()->withInput()->with('error', 'A conflict occurred generating the Certificate ID. Please try again.');
+            }
+            throw $e;
+        }
 
         return redirect('/admin/dashboard')
             ->with('success', 'Certificate created successfully! ID: ' . $certificate_id);
